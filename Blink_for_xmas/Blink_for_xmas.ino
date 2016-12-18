@@ -1,7 +1,7 @@
 /* 
 
 //michael
-mark out all serial stuff in production version
+mark out all //Serial stuff in production version
 ====
 
  Debounce
@@ -45,7 +45,7 @@ int ledState = LOW;         // the current state of the output pin
 int buttonState;             // the current reading from the input pin
 int lastButtonState = LOW;   // the previous reading from the input pin
 
-int playMode=2;  //we have diff modes
+int playMode=1;  //we have diff modes
 int countbeat = 0;
 
 int randomVals[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -70,15 +70,18 @@ void setup() {
 	pinMode( xmasLed6, OUTPUT );
 	pinMode( xmasLed7, OUTPUT );
 	
+  /*
   Serial.begin(9600);
  
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for Leonardo only
+  while (!//Serial) {
+    ; // wait for //Serial port to connect. Needed for Leonardo only
   }
-  Serial.println("serial started");
+  //Serial.println("//Serial started");
+  */
+  
   
 	//  int ss=sizeof(randomVals);
-	//  Serial.println(ss);  //wtf = 28, why?
+	//  //Serial.println(ss);  //wtf = 28, why?
   genRan(lampCount);
 }
 
@@ -120,19 +123,20 @@ void loop() {
 	switch (playMode) {
 		case 1:
 			//turn on one by one, then off one by one
-			ddlay=300;
-			
+			ddlay=200;
+			 
+     
 			for (i = 0; i < randomVal_length/2; i++) {
-				rand_pin=randomVals[i];
+				rand_pin=xmasLeds[randomVals[i]];
 				digitalWrite(rand_pin, HIGH);
-				digitalWrite(ledPin, HIGH);////
+				//digitalWrite(ledPin, HIGH);////
 				
 				delay(ddlay);
 			}
 			for (i = 0; i < randomVal_length/2; i++) {
-				rand_pin=randomVals[i];
+				rand_pin=xmasLeds[randomVals[i]];
 				digitalWrite(rand_pin, LOW);	
-				digitalWrite(ledPin, LOW);
+				//digitalWrite(ledPin, LOW);
 				
 				delay(ddlay*2);
 			}
@@ -145,13 +149,14 @@ void loop() {
 			
 			//lightup first 2
 			for (i = 0; i <= 1; i++) {
-				rand_pin=randomVals[i];
-				digitalWrite(rand_pin, HIGH);	
-				Serial.print(rand_pin);
+				rand_pin=xmasLeds[randomVals[i]];
+				digitalWrite(rand_pin, HIGH);
+				//Serial.print(rand_pin);
 			}
 			delay(ddlay);
 			
 			for (i = 0; i < randomVal_length-4; i=i+2) {
+			
 				rand_pin=xmasLeds[randomVals[i]];
 				rand_pin2=xmasLeds[randomVals[i+1]];
 				rand_pin3=xmasLeds[randomVals[i+2]];
@@ -162,19 +167,19 @@ void loop() {
 				digitalWrite(rand_pin3, HIGH);	
 				digitalWrite(rand_pin4, HIGH);	
 
-				Serial.print(rand_pin3);
-				Serial.print(rand_pin4);
+				//Serial.print(rand_pin3);
+				//Serial.print(rand_pin4);
 
 				delay(ddlay);
 			}
 			
 			//TURN OFF last 2
 			for (i = randomVal_length; i > randomVal_length-2; i--) {
-				rand_pin=randomVals[i];
+				rand_pin=xmasLeds[randomVals[i]];
 				digitalWrite(rand_pin, LOW);	
 			}
 			
-			Serial.print("\n===\n");
+			//Serial.print("\n===\n");
 			
 			break; 
 		case 3:
@@ -191,12 +196,12 @@ void loop() {
   	countbeat++;
     /*
      if ((countbeat % 7 )==0 ){
-      Serial.print("seven\n");
+      //Serial.print("seven\n");
     }
     */
     
    if ( countbeat >= 2 ){
-		 Serial.print("another random\n");
+		 //Serial.print("another random\n");
 		 genRan(lampCount);
 		 countbeat=0;
 		 
@@ -220,9 +225,9 @@ int genRan( int LastNum ){
 			/*
 			int i;		 
 			for (i = 0; i < LastNum; i++) {
-			  Serial.print(randomVals[i]); 
+			  //Serial.print(randomVals[i]); 
 			}
-			Serial.print("\n");
+			//Serial.print("\n");
 		  */
 		} 
 		
@@ -250,9 +255,9 @@ int genRan( int LastNum ){
 	//print result
 	int i;
 	for (i = 0; i < 14; i++) {
-		Serial.print(randomVals[i]); 
+		//Serial.print(randomVals[i]); 
 	}
-	Serial.print("\n");
+	//Serial.print("\n");
 }
  
  
