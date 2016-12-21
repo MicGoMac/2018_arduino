@@ -11,7 +11,7 @@ mark out all //Serial stuff in production version
  noise).  
  
  The circuit:
- * LED attached from pin 13 to ground
+ * LED attached from pin 13 to ground   indicationPin
  * pushbutton attached from pin 2 to +5V
  * 10K resistor attached from pin 2 to ground
  
@@ -24,7 +24,7 @@ mark out all //Serial stuff in production version
 
 // set pin numbers:
 const int buttonPin = 11;     // the number of the pushbutton pin
-const int ledPin =  13;      // the number of the LED pin
+const int indicationPin =  13;      // the number of the LED pin
 const int playModeCount=5;
 const int lampCount = 7;
 
@@ -45,8 +45,11 @@ int ledState = LOW;         // the current state of the output pin
 int buttonState;             // the current reading from the input pin
 int lastButtonState = LOW;   // the previous reading from the input pin
 
-int playMode=1;  //we have diff modes
+int playMode=2;  //we have diff modes
 int countbeat = 0;
+
+
+boolean alternate = false;
 
 int randomVals[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 const int randomVal_length=lampCount*2;
@@ -61,7 +64,7 @@ long debounceDelay = 50;    // the debounce time; increase if the output flicker
 
 void setup() {
   pinMode(buttonPin, INPUT);
-  pinMode(ledPin, OUTPUT);
+  pinMode(indicationPin, OUTPUT);
   pinMode( xmasLed1, OUTPUT );
   pinMode( xmasLed2, OUTPUT );  
 	pinMode( xmasLed3, OUTPUT );
@@ -110,7 +113,7 @@ void loop() {
   }
   
   // set the LED using the state of the button:
- //// digitalWrite(ledPin, buttonState);
+ //// digitalWrite(indicationPin, buttonState);
 
   // save the reading.  Next time through the loop,
   // it'll be the lastButtonState:
@@ -129,14 +132,14 @@ void loop() {
 			for (i = 0; i < randomVal_length/2; i++) {
 				rand_pin=xmasLeds[randomVals[i]];
 				digitalWrite(rand_pin, HIGH);
-				//digitalWrite(ledPin, HIGH);////
+				//digitalWrite(indicationPin, HIGH);////
 				
 				delay(ddlay);
 			}
 			for (i = 0; i < randomVal_length/2; i++) {
 				rand_pin=xmasLeds[randomVals[i]];
 				digitalWrite(rand_pin, LOW);	
-				//digitalWrite(ledPin, LOW);
+				//digitalWrite(indicationPin, LOW);
 				
 				delay(ddlay*2);
 			}
@@ -169,7 +172,8 @@ void loop() {
 
 				//Serial.print(rand_pin3);
 				//Serial.print(rand_pin4);
-
+				alternate = !alternate; //so it blink on the loop
+    		digitalWrite(indicationPin, alternate);
 				delay(ddlay);
 			}
 			
