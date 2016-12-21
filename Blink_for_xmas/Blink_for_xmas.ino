@@ -2,8 +2,9 @@
 
 //michael
 mark out all //Serial stuff in production version
-====
 
+added sleep timer to save battery
+===
  Debounce
  Each time the input pin goes from LOW to HIGH (e.g. because of a push-button
  press), the output pin is toggled from LOW to HIGH or HIGH to LOW.  There's
@@ -11,21 +12,16 @@ mark out all //Serial stuff in production version
  noise).  
  
  The circuit:
- * LED attached from pin 13 to ground   indicationPin
+ * LED 13 indicationPin, use onboard led
  * pushbutton attached from pin 2 to +5V
  * 10K resistor attached from pin 2 to ground
- 
- * Note: On most Arduino boards, there is already an LED on the board
- connected to pin 13, so you don't need any extra components for this example.
-  
- http://www.arduino.cc/en/Tutorial/Debounce
  */
 
 
 // set pin numbers:
 const int buttonPin = 11;     // the number of the pushbutton pin
 const int indicationPin =  13;      // the number of the LED pin
-const int playModeCount=5;
+const int playModeCount=4;
 const int lampCount = 7;
 
 const int xmasLed1= 3;
@@ -48,7 +44,7 @@ int lastButtonState = LOW;   // the previous reading from the input pin
 int playMode=2;  //we have diff modes
 int countbeat = 0;
 
-
+boolean sleepmode = false;
 boolean alternate = false;
 
 int randomVals[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -59,8 +55,10 @@ int xmasLeds[]={ xmasLed1, xmasLed1, xmasLed2,   xmasLed3, xmasLed4, xmasLed5, x
 
 // the following variables are long's because the time, measured in miliseconds,
 // will quickly become a bigger number than can be stored in an int.
-long lastDebounceTime = 0;  // the last time the output pin was toggled
-long debounceDelay = 50;    // the debounce time; increase if the output flickers
+long lastDebounceTime = 0;
+long debounceDelay = 200;    // the debounce time; increase if the output flickers
+
+long sleeptime = millis() + 1000*600;  //ten minutes
 
 void setup() {
   pinMode(buttonPin, INPUT);
@@ -89,37 +87,33 @@ void setup() {
 }
 
 void loop() { 
-    
-  // read the state of the switch into a local variable:
-  int reading = digitalRead(buttonPin);
- 
-  // check to see if you just pressed the button 
-  // (i.e. the input went from LOW to HIGH),  and you've waited 
-  // long enough since the last press to ignore any noise:  
 
-  // If the switch changed, due to noise or pressing:
-  if (reading != lastButtonState) {
-    // reset the debouncing timer
-    lastDebounceTime = millis();
-  } 
+  int buttonState = digitalRead(buttonPin);
   
-  if ((millis() - lastDebounceTime) > debounceDelay) {
-    // whatever the reading is at, it's been there for longer
-    // than the debounce delay, so take it as the actual current state:
-    buttonState = reading;
-    
-    //anyway, we want it to trigger a mode change
-    //modeChange();
+  // switch changed, may due to noise or human action,
+  // see how long ago it changed. If too short, ignore.
+  // no need to do any checking if buttonState no change, right?
+  
+  if (buttonState != lastButtonState) {
+  	
+  	if ((millis() - lastDebounceTime) > debounceDelay) {
+			//do a mode change on valid trigger
+			////modeChange();
+			
+			//wake up if sleeping
+			sleepmode = false;
+	  }
+   
+		//true trigger or false debounce, update these
+		lastDebounceTime = millis();
+		// save the reading for next loop,
+		lastButtonState = buttonState;
   }
   
-  // set the LED using the state of the button:
- //// digitalWrite(indicationPin, buttonState);
-
-  // save the reading.  Next time through the loop,
-  // it'll be the lastButtonState:
-  lastButtonState = reading;
   
+  if (millis()>sleeptime){ sleepmode = true; }
   
+  if ( sleepmode == true ){break; }
   
 	int i;
   
@@ -186,11 +180,73 @@ void loop() {
 			//Serial.print("\n===\n");
 			
 			break; 
+		
+		
 		case 3:
+		//== case 1, but much faster
+			//turn on one by one, then off one by one
+			ddlay=50;
+			 
+     
+			for (i = 0; i < randomVal_length/2; i++) {
+				rand_pin=xmasLeds[randomVals[i]];
+				digitalWrite(rand_pin, HIGH);
+				//digitalWrite(indicationPin, HIGH);////
+				
+				delay(ddlay);
+			}
+			for (i = 0; i < randomVal_length/2; i++) {
+				rand_pin=xmasLeds[randomVals[i]];
+				digitalWrite(rand_pin, LOW);	
+				//digitalWrite(indicationPin, LOW);
+				
+				delay(ddlay*2);
+			}	
 			
 			break;
+		
+		
+		
 		case 4:
+			//just like case 2 but faster
 			
+			//turn on 2 at a time
+			ddlay=100;
+			
+			//lightup first 2
+			for (i = 0; i <= 1; i++) {
+				rand_pin=xmasLeds[randomVals[i]];
+				digitalWrite(rand_pin, HIGH);
+				//Serial.print(rand_pin);
+			}
+			delay(ddlay);
+			
+			for (i = 0; i < randomVal_length-4; i=i+2) {
+			
+				rand_pin=xmasLeds[randomVals[i]];
+				rand_pin2=xmasLeds[randomVals[i+1]];
+				rand_pin3=xmasLeds[randomVals[i+2]];
+				rand_pin4=xmasLeds[randomVals[i+3]];
+				
+				digitalWrite(rand_pin, LOW);	
+				digitalWrite(rand_pin2, LOW);
+				digitalWrite(rand_pin3, HIGH);	
+				digitalWrite(rand_pin4, HIGH);	
+
+				//Serial.print(rand_pin3);
+				//Serial.print(rand_pin4);
+				alternate = !alternate; //so it blink on the loop
+    		digitalWrite(indicationPin, alternate);
+				delay(ddlay);
+			}
+			
+			//TURN OFF last 2
+			for (i = randomVal_length; i > randomVal_length-2; i--) {
+				rand_pin=xmasLeds[randomVals[i]];
+				digitalWrite(rand_pin, LOW);	
+			}
+			
+			//Serial.print("\n===\n");
 			break; 
 		case 5:
 			
