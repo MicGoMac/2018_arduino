@@ -41,7 +41,7 @@ int ledState = LOW;         // the current state of the output pin
 int buttonState;             // the current reading from the input pin
 int lastButtonState = LOW;   // the previous reading from the input pin
 
-int playMode=2;  //we have diff modes
+int playMode=1;  //we have diff modes
 int countbeat = 0;
 
 boolean sleepmode = false;
@@ -58,7 +58,8 @@ int xmasLeds[]={ xmasLed1, xmasLed1, xmasLed2,   xmasLed3, xmasLed4, xmasLed5, x
 long lastDebounceTime = 0;
 long debounceDelay = 200;    // the debounce time; increase if the output flickers
 
-long sleeptime = millis() + 1000*600;  //ten minutes
+//long sleeptime = millis() + 1000*600;  //ten minutes
+long sleeptime = millis() + 1000*180;  //3 minutes, do mode change instead
 
 void setup() {
   pinMode(buttonPin, INPUT);
@@ -99,7 +100,7 @@ void loop() {
   	if ((millis() - lastDebounceTime) > debounceDelay) {
 			//do a mode change on valid trigger
 			////modeChange();
-			
+ 
 			//wake up if sleeping
 			sleepmode = false;
 	  }
@@ -111,7 +112,15 @@ void loop() {
   }
   
   
-  if (millis()>sleeptime){ sleepmode = true; }
+  if (millis()>sleeptime){ 
+     if ( playMode > playModeCount ){
+      sleepmode = true; 
+      playMode=1;
+     } else {
+      playMode++;
+     }
+    
+  }
   
   if ( sleepmode == true ){break; }
   
