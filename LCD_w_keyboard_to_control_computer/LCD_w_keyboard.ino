@@ -1,0 +1,174 @@
+
+
+#include <LiquidCrystal.h>
+#include "PS2Keyboard.h"
+#include "pitches.h"
+/*
+
+http://digital-salvage.net/?p=124
+*/
+
+LiquidCrystal lcd(4, 5,  8, 9, 10, 11); //create the lcd variable
+
+const int DataPin = 2;
+const int IRQpin =  3;
+const int soundPin = 6;
+
+int count;
+int mode_num = 0;
+boolean soundon = true;
+String inputstr = "";
+
+PS2Keyboard keyboard;
+
+void setup() {
+  delay(1000);
+ keyboard.begin(DataPin, IRQpin);
+  
+  lcd.clear();                    //clear the LCD during setup
+  lcd.begin(16,2);                //define the columns (16) and rows (2)
+  lcd.print("Press key");          //print...
+  count=0;
+}
+ 
+void loop() {
+  
+  if (keyboard.available()) {
+     lcd.setCursor(0,0);
+     
+     
+    // read the next key
+    char c = keyboard.read();
+     
+    // check for some of the special keys
+    if (c == PS2_ENTER) {
+      
+      lcd.print("ACTION >>        "); 
+      
+      String codestring = inputstr.substring(1, 2);
+      String codeType = inputstr.substring(0, 1);
+      
+      if ( codeType=="9" ){
+      	int acode = codestring.toInt();
+      	actionA(acode);
+      	inputstr="";
+      }
+      
+      if ( codeType=="8" ){
+      	int acode = codestring.toInt();
+      	actionB(acode);
+      	inputstr="";
+      }
+      
+      
+    } else if (c == PS2_TAB) {
+      lcd.print("[Tab]      ");
+    } else if (c == PS2_ESC) {
+      lcd.print("[ESC]      ");
+    } else if (c == PS2_PAGEDOWN) {
+      lcd.print("[PgDn]     ");
+    } else if (c == PS2_PAGEUP) {
+      lcd.print("[PgUp]    ");
+    } else if (c == PS2_LEFTARROW) {
+      lcd.print("[Left]    ");
+    } else if (c == PS2_RIGHTARROW) {
+      lcd.print("[Right]    ");
+    } else if (c == PS2_UPARROW) {
+      lcd.print("[Up]   ");
+    } else if (c == PS2_DOWNARROW) {
+      lcd.print("[Down]   ");
+    } else if (c == PS2_DELETE) {
+      lcd.print("[Del]   ");
+    } else if (c == PS2_END) {
+      lcd.print("[PS2_END]");
+    } else if (c == PS2_HOME) {
+      lcd.print("[PS2_HOME]");
+    } else if (c == PS2_INSERT) {
+      lcd.print("[PS2_INSERT]");      
+    } else {
+      
+      String newString = String(c);
+      inputstr = inputstr + newString;
+      int inputLen= inputstr.length();
+      if ( inputLen == 1 ){
+        lcd.print( inputstr + "                ");
+      } else if ( inputLen <= 8 ){
+        lcd.print( inputstr + "        ");
+      }
+    }
+  }
+  
+  /*
+  count++;
+  if (count>1000){
+   count=0; 
+  }
+  */
+  
+  delay(100);
+   
+}
+
+void simplebeep(){
+ tone(soundPin, NOTE_G5, 200 );  
+}
+
+void actionA( int actioncode){
+  lcd.setCursor(0,1);
+  
+  switch (actioncode) {
+    default:
+    case 0:
+    	mode_num = 0;
+      	lcd.print("mode 0        ");
+   		break;
+    case 1:
+    	mode_num = 1;
+      	lcd.print("mode 1        ");
+   		break;     
+    case 2:
+    	mode_num = 2;
+      	lcd.print("mode 2        ");
+   		break;        
+    case 3:
+    	mode_num = 3;
+      	lcd.print("mode 3        ");
+   		break;        
+    }
+    if ( soundon ){
+   		simplebeep();
+   		}
+  }
+  
+  void actionB( int actioncode){
+  lcd.setCursor(0,1);
+  
+  switch (actioncode) {
+    default:
+    case 0:
+    	soundon = !soundon;
+    	if ( soundon ){
+      		lcd.print("sound on        ");
+   			break; 
+   		}else{
+   			lcd.print("sound off        ");
+   			break; 
+   		}
+    case 1:
+    	mode_num = 1;
+      	lcd.print("modeB 1        ");
+   		break;     
+    case 2:
+    	mode_num = 2;
+      	lcd.print("modeB 2        ");
+   		break;        
+    case 3:
+    	mode_num = 3;
+      	lcd.print("modeB 3        ");
+   		break;        
+  }
+   if ( soundon ){
+	   simplebeep();
+	   }
+   
+ }
